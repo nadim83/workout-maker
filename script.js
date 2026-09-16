@@ -137,7 +137,7 @@ loadPresetBtn.addEventListener('click', () => {
     }
 });
 
-// Render Workouts Grouped inside single Day Cards
+// Render Workouts Grouped inside single Day Cards (FIXED & ROBUST)
 function renderWorkouts() {
     workoutList.innerHTML = '';
     
@@ -176,7 +176,7 @@ function renderWorkouts() {
                         <h5 class="font-semibold text-slate-100 text-xs">${ex.name}</h5>
                         <p class="text-[10px] text-slate-400">${ex.sets} Sets | Base Load: <strong class="text-emerald-400">${ex.weight} kg</strong></p>
                     </div>
-                    <button onclick="deleteWorkout(${ex.globalIndex})" class="text-slate-600 hover:text-rose-400 p-1.5 transition">
+                    <button type="button" class="delete-ex-btn text-slate-600 hover:text-rose-400 p-1.5 transition" data-index="${ex.globalIndex}">
                         <i class="fa-solid fa-trash-can text-xs"></i>
                     </button>
                 </div>
@@ -195,6 +195,14 @@ function renderWorkouts() {
 
         workoutList.appendChild(dayCard);
     });
+
+    // Attach Event Listeners to Delete Buttons Safely
+    document.querySelectorAll('.delete-ex-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.currentTarget.getAttribute('data-index'));
+            deleteWorkout(idx);
+        });
+    });
 }
 
 // Form Submit Handler
@@ -204,16 +212,25 @@ workoutForm.addEventListener('submit', (e) => {
     const selectedDay = exDaySelect.value;
     const selectedSplit = exSplitSelect.value;
 
-    const name = document.getElementById('exName').value;
-    const weight = parseFloat(document.getElementById('exWeight').value);
-    const sets = document.getElementById('exSets').value;
+    const nameInput = document.getElementById('exName');
+    const weightInput = document.getElementById('exWeight');
+    const setsInput = document.getElementById('exSets');
+
+    const name = nameInput.value.trim();
+    const weight = parseFloat(weightInput.value);
+    const sets = setsInput.value;
+
+    if (!name || isNaN(weight) || !sets) {
+        alert("Please fill in all exercise fields correctly!");
+        return;
+    }
 
     customWorkouts.push({ mode: currentMode, day: selectedDay, split: selectedSplit, name, weight, sets });
     localStorage.setItem('day_split_workouts_v7', JSON.stringify(customWorkouts));
 
-    document.getElementById('exName').value = '';
-    document.getElementById('exWeight').value = '';
-    document.getElementById('exSets').value = '';
+    nameInput.value = '';
+    weightInput.value = '';
+    setsInput.value = '';
 
     exDaySelect.value = selectedDay;
     exSplitSelect.value = selectedSplit;
@@ -221,7 +238,7 @@ workoutForm.addEventListener('submit', (e) => {
     renderWorkouts();
 });
 
-window.deleteWorkout = function(index) {
+function deleteWorkout(index) {
     customWorkouts.splice(index, 1);
     localStorage.setItem('day_split_workouts_v7', JSON.stringify(customWorkouts));
     renderWorkouts();
@@ -317,8 +334,11 @@ generateProgramBtn.addEventListener('click', async () => {
         return;
     }
 
-    const clientName = document.getElementById('clientName').value.trim() || 'ATHLETE';
-    const coachName = document.getElementById('coachName').value.trim() || 'MD. Nadim Khan';
+    const clientNameInput = document.getElementById('clientName');
+    const coachNameInput = document.getElementById('coachName');
+
+    const clientName = clientNameInput ? clientNameInput.value.trim() : 'ATHLETE';
+    const coachName = coachNameInput ? coachNameInput.value.trim() : 'MD. Nadim Khan';
     const dateStr = new Date().toLocaleDateString();
 
     pdfClientDisplay.textContent = `${clientName.toUpperCase()} - 5 WEEK PLAN`;
@@ -380,7 +400,7 @@ function renderAnalyticsList() {
             </div>
             <div class="flex items-center space-x-2">
                 <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">View Routine</span>
-                <button onclick="deleteAnalyticsRecord(event, '${client.id}')" class="text-slate-600 hover:text-rose-400 p-1">
+                <button type="button" class="delete-analytics-btn text-slate-600 hover:text-rose-400 p-1" data-id="${client.id}">
                     <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
             </div>
@@ -396,18 +416,21 @@ function renderAnalyticsList() {
 
         analyticsClientList.appendChild(item);
     });
-}
 
-// Delete Record from Firebase Firestore
-window.deleteAnalyticsRecord = async function(event, docId) {
-    event.stopPropagation();
-    if(confirm("Delete this client routine record permanently from Cloud?")) {
-        try {
-            await deleteDoc(doc(db, "client_analytics", docId));
-        } catch (e) {
-            console.error("Error deleting document: ", e);
-        }
-    }
+    // Attach Event Listeners to Delete Analytics Buttons Safely
+    document.querySelectorAll('.delete-analytics-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const docId = e.currentTarget.getAttribute('data-id');
+            if(confirm("Delete this client routine record permanently from Cloud?")) {
+                try {
+                    await deleteDoc(doc(db, "client_analytics", docId));
+                } catch (err) {
+                    console.error("Error deleting document: ", err);
+                }
+            }
+        });
+    });
 }
 
 // EXPORT BACKUP DATA (JSON)
@@ -452,8 +475,11 @@ importDataInput.addEventListener('change', (e) => {
 // Multi-Page PDF Export
 downloadPdfBtn.addEventListener('click', () => {
     const element = document.getElementById('pdfContent');
-    const clientName = document.getElementById('clientName').value.trim() || 'Client';
-    const coachName = document.getElementById('coachName').value.trim() || 'MD. Nadim Khan';
+    const clientNameInput = document.getElementById('clientName');
+    const coachNameInput = document.getElementById('coachName');
+
+    const clientName = clientNameInput ? clientNameInput.value.trim() : 'Client';
+    const coachName = coachNameInput ? coachNameInput.value.trim() : 'MD. Nadim Khan';
 
     const originalStyle = element.getAttribute('style') || '';
     
