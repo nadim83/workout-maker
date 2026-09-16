@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-Week Advanced Routine Builder & Analytics</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Header -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-3.5">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-xl text-emerald-400">
+                    <i class="fa-solid fa-dumbbell text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base text-slate-100 leading-tight tracking-wide">PROGRESSIVE BUILDER</h1>
+                    <p class="text-[11px] text-slate-400">Day-Grouped Split & Analytics</p>
+                </div>
+            </div>
+            <button id="generateProgramBtn" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center space-x-1.5 shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Generate</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-md mx-auto w-full p-4 space-y-4 mb-auto">
+
+        <!-- Client & Coach Info Card -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center">
+                <i class="fa-solid fa-id-card text-emerald-400 mr-2"></i> Client & Coach Info
+            </h2>
+            <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Client Name</label>
+                    <input type="text" id="clientName" placeholder="e.g. Client Name" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Coach Name</label>
+                    <input type="text" id="coachName" value="MD. Nadim Khan" placeholder="e.g. Coach Nadim" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-400 font-semibold focus:outline-none focus:border-emerald-500">
+                </div>
+            </div>
+        </section>
+
+        <!-- Mode Selector & Preset Template Loader -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2.5 shadow-xl">
+            <div class="grid grid-cols-2 gap-2">
+                <button id="btnHypertrophy" type="button" class="mode-tab active-tab text-xs py-2.5 rounded-xl font-bold border transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Hypertrophy</span>
+                </button>
+                <button id="btnStrength" type="button" class="mode-tab inactive-tab text-xs py-2.5 rounded-xl font-bold border transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Strength Training</span>
+                </button>
+            </div>
+
+            <!-- Quick Preset Template Button -->
+            <button id="loadPresetBtn" type="button" class="w-full bg-slate-950 hover:bg-slate-800 text-amber-400 border border-amber-500/30 font-semibold py-2 rounded-xl transition text-[11px] flex items-center justify-center space-x-1.5">
+                <i class="fa-solid fa-layer-group"></i>
+                <span id="presetBtnText">Load 1-Click PPL Preset Template</span>
+            </button>
+        </section>
+
+        <!-- Exercise Setup Form -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3.5 shadow-xl">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center">
+                <i class="fa-solid fa-plus-minus text-emerald-400 mr-2"></i> Add Workout Setup
+            </h2>
+            
+            <form id="workoutForm" class="space-y-3">
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Select Day</label>
+                        <select id="exDay" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
+                            <option value="Day 1">Day 1</option>
+                            <option value="Day 2">Day 2</option>
+                            <option value="Day 3">Day 3</option>
+                            <option value="Day 4">Day 4</option>
+                            <option value="Day 5">Day 5</option>
+                            <option value="Day 6">Day 6</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Target Split Focus</label>
+                        <select id="exSplit" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-100 font-semibold focus:outline-none focus:border-emerald-500">
+                            <!-- Dynamically filled by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Exercise Name</label>
+                    <input type="text" id="exName" required placeholder="e.g. Incline Bench Press / Squat" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Base Weight (kg)</label>
+                        <input type="number" id="exWeight" required placeholder="e.g. 60" min="0" step="0.5" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">Sets</label>
+                        <input type="number" id="exSets" required placeholder="e.g. 3" min="1" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 font-semibold py-2.5 rounded-xl transition text-xs flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Add Exercise to Day</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Added Workouts Grouped Preview -->
+        <section class="space-y-2.5">
+            <div class="flex justify-between items-center px-1">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Current Workout Days (<span id="countBadge">0</span>)</h3>
+                <button id="clearAll" class="text-xs text-rose-400 hover:text-rose-300 transition hidden">Clear All</button>
+            </div>
+
+            <div id="workoutList" class="space-y-3">
+                <!-- Grouped Day Cards Go Here -->
+            </div>
+
+            <div id="emptyState" class="text-center py-8 px-4 bg-slate-900/40 border border-dashed border-slate-800 rounded-2xl">
+                <p class="text-xs text-slate-500">Select Day & Split to add exercises into grouped day blocks.</p>
+            </div>
+        </section>
+
+        <!-- CLIENT ROUTINE ANALYTICS & BACKUP/RESTORE SECTION -->
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl mt-6">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center">
+                    <i class="fa-solid fa-chart-pie mr-2 text-sm"></i> Client Routine Analytics
+                </h2>
+                <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full border border-slate-700 font-mono" id="analyticsCount">0 Saved</span>
+            </div>
+            
+            <p class="text-[11px] text-slate-400">Click on any client below to view their generated 5-week progressive routine:</p>
+            
+            <div id="analyticsClientList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                <!-- Saved Clients dynamically injected here -->
+            </div>
+
+            <!-- Backup & Restore Data Feature -->
+            <div class="pt-2 border-t border-slate-800 grid grid-cols-2 gap-2">
+                <button id="exportDataBtn" type="button" class="bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-700 py-2 rounded-xl transition text-[11px] font-semibold flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-file-export text-emerald-400"></i>
+                    <span>Export Backup JSON</span>
+                </button>
+                <label class="bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-700 py-2 rounded-xl transition text-[11px] font-semibold flex items-center justify-center space-x-1.5 cursor-pointer text-center">
+                    <i class="fa-solid fa-file-import text-amber-400"></i>
+                    <span>Import Backup Data</span>
+                    <input type="file" id="importDataInput" accept=".json" class="hidden">
+                </label>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 5-Week Program Modal & PDF Export -->
+    <div id="programModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-3 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-4 space-y-4 shadow-2xl animate-in max-h-[90vh] flex flex-col">
+            
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+                <div>
+                    <h3 class="font-bold text-slate-100 text-sm">5-Week Overload Generated</h3>
+                    <p class="text-[10px] text-emerald-400">Day-Wise Split Progressive Plan</p>
+                </div>
+                <button id="closeModal" class="text-slate-500 hover:text-slate-300 text-sm p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- PDF Container Content with Vertical Scroll -->
+            <div id="pdfContent" class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-4 overflow-y-auto font-sans max-h-[65vh]">
+                <!-- PDF Header Info -->
+                <div class="border-b border-slate-800 pb-2 flex justify-between items-end">
+                    <div>
+                        <h2 id="pdfClientDisplay" class="text-emerald-400 font-extrabold text-sm tracking-wide">CLIENT: PROGRAM</h2>
+                        <p id="pdfModeDisplay" class="text-[9px] text-slate-400 uppercase">5-Week Block</p>
+                    </div>
+                    <span id="pdfDate" class="text-[9px] text-slate-500 font-mono"></span>
+                </div>
+
+                <!-- Generated 5 Weeks View -->
+                <div id="modalProgramContent" class="space-y-3.5">
+                    <!-- Dynamic 5-Week Cards Injected via JS -->
+                </div>
+
+                <!-- Footer Note -->
+                <div class="text-[8px] text-slate-600 text-center border-t border-slate-900 pt-2">
+                    Deload Week: -40% Load Cut for Peak Recovery & Supercompensation.
+                </div>
+            </div>
+
+            <!-- PDF Download Button -->
+            <button id="downloadPdf" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl transition text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                <span>Download 5-Week Program PDF</span>
+            </button>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

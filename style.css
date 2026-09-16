@@ -1,0 +1,53 @@
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.active-tab {
+    background-color: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #34d399;
+}
+
+.inactive-tab {
+    background-color: #0f172a;
+    border-color: #1e293b;
+    color: #64748b;
+}
+
+/* Vertical Scrollbar System for Analytics & PDF View */
+#pdfContent::-webkit-scrollbar,
+#analyticsClientList::-webkit-scrollbar {
+    width: 4px;
+}
+
+#pdfContent::-webkit-scrollbar-track,
+#analyticsClientList::-webkit-scrollbar-track {
+    background: #020617;
+    border-radius: 4px;
+}
+
+#pdfContent::-webkit-scrollbar-thumb,
+#analyticsClientList::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 6px;
+}
+
+#pdfContent::-webkit-scrollbar-thumb:hover,
+#analyticsClientList::-webkit-scrollbar-thumb:hover {
+    background: #10b981;
+}
+
+.animate-in {
+    animation: modalSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalSlide {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
