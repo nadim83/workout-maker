@@ -1,3 +1,31 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    onSnapshot, 
+    doc, 
+    deleteDoc, 
+    query, 
+    orderBy 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAh71e8jXZymGo3T-C2KegF9jfKHISe44s",
+  authDomain: "workout-maker-c3953.firebaseapp.com",
+  projectId: "workout-maker-c3953",
+  storageBucket: "workout-maker-c3953.firebasestorage.app",
+  messagingSenderId: "315761632794",
+  appId: "1:315761632794:web:d4ba51ed996e43948e53a3",
+  measurementId: "G-FXE9HY2Y77"
+};
+
+// Initialize Firebase & Firestore Cloud Database
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// DOM Elements Selection
 const btnHypertrophy = document.getElementById('btnHypertrophy');
 const btnStrength = document.getElementById('btnStrength');
 const loadPresetBtn = document.getElementById('loadPresetBtn');
@@ -40,7 +68,7 @@ const splitOptions = {
     ]
 };
 
-// Preset Templates Data (Strictly Mapped)
+// Preset Templates
 const presetTemplates = {
     hypertrophy: [
         { mode: 'hypertrophy', day: 'Day 1', split: 'Push: Chest, Shoulder & Triceps', name: 'Barbell Bench Press', weight: 60, sets: 3 },
@@ -67,7 +95,7 @@ const presetTemplates = {
 };
 
 let customWorkouts = JSON.parse(localStorage.getItem('day_split_workouts_v7')) || [];
-let savedClientAnalytics = JSON.parse(localStorage.getItem('client_analytics_v1')) || [];
+let savedClientAnalytics = [];
 
 function populateSplitOptions() {
     const currentSelectedSplit = exSplitSelect.value;
@@ -99,7 +127,7 @@ btnStrength.addEventListener('click', () => {
     populateSplitOptions();
 });
 
-// Load Preset Template Click Handler (FIXED)
+// Load Preset Template
 loadPresetBtn.addEventListener('click', () => {
     const templateData = presetTemplates[currentMode];
     if (templateData && templateData.length > 0) {
@@ -109,7 +137,7 @@ loadPresetBtn.addEventListener('click', () => {
     }
 });
 
-// Render Added Workouts GROUPED inside single Day Cards
+// Render Workouts Grouped inside single Day Cards
 function renderWorkouts() {
     workoutList.innerHTML = '';
     
@@ -169,7 +197,7 @@ function renderWorkouts() {
     });
 }
 
-// FORM SUBMIT
+// Form Submit Handler
 workoutForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
@@ -207,7 +235,7 @@ clearAllBtn.addEventListener('click', () => {
     }
 });
 
-// Build 5-Week Routine HTML Structure
+// Build 5-Week Routine HTML
 function generateRoutineHTML(clientName, mode, workoutData) {
     const weeksConfig = [
         { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Technique & Baseline Load' },
@@ -282,8 +310,8 @@ function generateRoutineHTML(clientName, mode, workoutData) {
     return fullHtml;
 }
 
-// Generate & Save to Analytics
-generateProgramBtn.addEventListener('click', () => {
+// FIREBASE CLOUD SAVE: Generate & Save to Firestore
+generateProgramBtn.addEventListener('click', async () => {
     if(customWorkouts.length === 0) {
         alert("Please add at least one exercise!");
         return;
@@ -299,23 +327,20 @@ generateProgramBtn.addEventListener('click', () => {
 
     modalProgramContent.innerHTML = generateRoutineHTML(clientName, currentMode, customWorkouts);
 
-    const existingIndex = savedClientAnalytics.findIndex(c => c.name.toLowerCase() === clientName.toLowerCase());
     const newRecord = {
         name: clientName,
         coach: coachName,
         date: dateStr,
         mode: currentMode,
-        workouts: [...customWorkouts]
+        workouts: [...customWorkouts],
+        createdAt: Date.now()
     };
 
-    if (existingIndex >= 0) {
-        savedClientAnalytics[existingIndex] = newRecord;
-    } else {
-        savedClientAnalytics.push(newRecord);
+    try {
+        await addDoc(collection(db, "client_analytics"), newRecord);
+    } catch (e) {
+        console.error("Error adding document to Firebase: ", e);
     }
-
-    localStorage.setItem('client_analytics_v1', JSON.stringify(savedClientAnalytics));
-    renderAnalyticsList();
 
     programModal.classList.remove('hidden');
 });
@@ -324,29 +349,38 @@ closeModal.addEventListener('click', () => {
     programModal.classList.add('hidden');
 });
 
-// Render Client Analytics List
+// FIREBASE REAL-TIME SYNC: Fetch Client Analytics List from Firestore
+const q = query(collection(db, "client_analytics"), orderBy("createdAt", "desc"));
+onSnapshot(q, (snapshot) => {
+    savedClientAnalytics = [];
+    snapshot.forEach((docSnap) => {
+        savedClientAnalytics.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    renderAnalyticsList();
+});
+
 function renderAnalyticsList() {
     analyticsClientList.innerHTML = '';
     analyticsCount.textContent = `${savedClientAnalytics.length} Saved`;
 
     if (savedClientAnalytics.length === 0) {
-        analyticsClientList.innerHTML = `<p class="text-[11px] text-slate-600 italic">No saved client routines found.</p>`;
+        analyticsClientList.innerHTML = `<p class="text-[11px] text-slate-600 italic">No saved client routines found in Cloud.</p>`;
         return;
     }
 
-    savedClientAnalytics.forEach((client, idx) => {
+    savedClientAnalytics.forEach((client) => {
         const item = document.createElement('div');
         item.className = "bg-slate-950 border border-slate-800 hover:border-emerald-500/50 p-2.5 rounded-xl flex justify-between items-center cursor-pointer transition";
         item.innerHTML = `
             <div>
                 <h4 class="font-bold text-slate-200 text-xs flex items-center">
-                    <i class="fa-solid fa-user-check text-emerald-400 mr-1.5 text-[10px]"></i> ${client.name}
+                    <i class="fa-solid fa-cloud text-emerald-400 mr-1.5 text-[10px]"></i> ${client.name}
                 </h4>
                 <p class="text-[9px] text-slate-500">${client.date} | Coach: ${client.coach || 'MD. Nadim Khan'}</p>
             </div>
             <div class="flex items-center space-x-2">
                 <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">View Routine</span>
-                <button onclick="deleteAnalyticsRecord(event, ${idx})" class="text-slate-600 hover:text-rose-400 p-1">
+                <button onclick="deleteAnalyticsRecord(event, '${client.id}')" class="text-slate-600 hover:text-rose-400 p-1">
                     <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
             </div>
@@ -364,12 +398,15 @@ function renderAnalyticsList() {
     });
 }
 
-window.deleteAnalyticsRecord = function(event, idx) {
+// Delete Record from Firebase Firestore
+window.deleteAnalyticsRecord = async function(event, docId) {
     event.stopPropagation();
-    if(confirm("Delete this client routine record?")) {
-        savedClientAnalytics.splice(idx, 1);
-        localStorage.setItem('client_analytics_v1', JSON.stringify(savedClientAnalytics));
-        renderAnalyticsList();
+    if(confirm("Delete this client routine record permanently from Cloud?")) {
+        try {
+            await deleteDoc(doc(db, "client_analytics", docId));
+        } catch (e) {
+            console.error("Error deleting document: ", e);
+        }
     }
 }
 
@@ -393,19 +430,20 @@ importDataInput.addEventListener('change', (e) => {
     const fileReader = new FileReader();
     if (e.target.files.length === 0) return;
 
-    fileReader.onload = (event) => {
+    fileReader.onload = async (event) => {
         try {
             const importedData = JSON.parse(event.target.result);
             if (Array.isArray(importedData)) {
-                savedClientAnalytics = importedData;
-                localStorage.setItem('client_analytics_v1', JSON.stringify(savedClientAnalytics));
-                renderAnalyticsList();
-                alert("Client analytics data imported successfully!");
+                for (const item of importedData) {
+                    delete item.id;
+                    await addDoc(collection(db, "client_analytics"), { ...item, createdAt: Date.now() });
+                }
+                alert("Client analytics data imported to Firebase successfully!");
             } else {
                 alert("Invalid JSON format.");
             }
         } catch (err) {
-            alert("Error parsing JSON file.");
+            alert("Error importing to Firebase.");
         }
     };
     fileReader.readAsText(e.target.files[0]);
@@ -488,4 +526,3 @@ downloadPdfBtn.addEventListener('click', () => {
 
 populateSplitOptions();
 renderWorkouts();
-renderAnalyticsList();
