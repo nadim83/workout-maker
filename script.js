@@ -11,6 +11,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
+// Firebase Initialization (Compat Version - No Import Error)
 const firebaseConfig = {
   apiKey: "AIzaSyAh71e8jXZymGo3T-C2KegF9jfKHISe44s",
   authDomain: "workout-maker-c3953.firebaseapp.com",
@@ -21,9 +22,8 @@ const firebaseConfig = {
   measurementId: "G-FXE9HY2Y77"
 };
 
-// Initialize Firebase & Firestore Cloud Database
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // DOM Elements Selection
 const btnHypertrophy = document.getElementById('btnHypertrophy');
@@ -137,7 +137,7 @@ loadPresetBtn.addEventListener('click', () => {
     }
 });
 
-// Render Workouts Grouped inside single Day Cards (FIXED & ROBUST)
+// Render Workouts Grouped inside single Day Cards
 function renderWorkouts() {
     workoutList.innerHTML = '';
     
@@ -196,7 +196,6 @@ function renderWorkouts() {
         workoutList.appendChild(dayCard);
     });
 
-    // Attach Event Listeners to Delete Buttons Safely
     document.querySelectorAll('.delete-ex-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const idx = parseInt(e.currentTarget.getAttribute('data-index'));
@@ -353,11 +352,11 @@ generateProgramBtn.addEventListener('click', async () => {
         date: dateStr,
         mode: currentMode,
         workouts: [...customWorkouts],
-        createdAt: Date.now()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     try {
-        await addDoc(collection(db, "client_analytics"), newRecord);
+        await db.collection("client_analytics").add(newRecord);
     } catch (e) {
         console.error("Error adding document to Firebase: ", e);
     }
@@ -370,8 +369,7 @@ closeModal.addEventListener('click', () => {
 });
 
 // FIREBASE REAL-TIME SYNC: Fetch Client Analytics List from Firestore
-const q = query(collection(db, "client_analytics"), orderBy("createdAt", "desc"));
-onSnapshot(q, (snapshot) => {
+db.collection("client_analytics").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
     savedClientAnalytics = [];
     snapshot.forEach((docSnap) => {
         savedClientAnalytics.push({ id: docSnap.id, ...docSnap.data() });
@@ -417,14 +415,13 @@ function renderAnalyticsList() {
         analyticsClientList.appendChild(item);
     });
 
-    // Attach Event Listeners to Delete Analytics Buttons Safely
     document.querySelectorAll('.delete-analytics-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
             const docId = e.currentTarget.getAttribute('data-id');
             if(confirm("Delete this client routine record permanently from Cloud?")) {
                 try {
-                    await deleteDoc(doc(db, "client_analytics", docId));
+                    await db.collection("client_analytics").doc(docId).delete();
                 } catch (err) {
                     console.error("Error deleting document: ", err);
                 }
@@ -459,7 +456,7 @@ importDataInput.addEventListener('change', (e) => {
             if (Array.isArray(importedData)) {
                 for (const item of importedData) {
                     delete item.id;
-                    await addDoc(collection(db, "client_analytics"), { ...item, createdAt: Date.now() });
+                    await db.collection("client_analytics").add({ ...item, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
                 }
                 alert("Client analytics data imported to Firebase successfully!");
             } else {
