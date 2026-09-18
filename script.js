@@ -254,13 +254,27 @@ clearAllBtn.addEventListener('click', () => {
 
 // Build 5-Week Routine HTML
 function generateRoutineHTML(clientName, mode, workoutData) {
-    const weeksConfig = [
-        { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Technique & Baseline Load' },
-        { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: '+5kg Squat/DL, +2.5kg Others | 9 Reps' },
-        { week: 3, title: 'Week 3: Progression 2', repTarget: 10, note: '+5kg Squat/DL, +2.5kg Others | 10 Reps' },
-        { week: 4, title: 'Week 4: Peak Overload', repTarget: 12, note: 'Max Intent Peak | 12 Reps' },
-        { week: 5, title: 'Week 5: Deload Recovery', repTarget: 8, note: 'Deload: -40% Weight Reduction' }
-    ];
+    let weeksConfig = [];
+
+    // Mode check kore dynamic config set kora hocche
+    if (mode === 'Strength Training') {
+        weeksConfig = [
+            { week: 1, title: 'Week 1: Base Line', repTarget: 5, note: 'Heavy Single/Low Reps' },
+            { week: 2, title: 'Week 2: Progression 1', repTarget: 3, note: 'Strength Focus' },
+            { week: 3, title: 'Week 3: Progression 2', repTarget: 2, note: 'Intensity Block' },
+            { week: 4, title: 'Week 4: Peak Overload', repTarget: 1, note: 'Max Effort' },
+            { week: 5, title: 'Week 5: Deload Recovery', repTarget: 5, note: 'Deload: -40% Weight' }
+        ];
+    } else {
+        // Default ba Hypertrophy-er jonno ager config
+        weeksConfig = [
+            { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Technique & Baseline Load' },
+            { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: '+5kg Squat/DL, +2.5kg Others | 9 Reps' },
+            { week: 3, title: 'Week 3: Progression 2', repTarget: 10, note: '+5kg Squat/DL, +2.5kg Others | 10 Reps' },
+            { week: 4, title: 'Week 4: Peak Overload', repTarget: 12, note: 'Max Intent Peak | 12 Reps' },
+            { week: 5, title: 'Week 5: Deload Recovery', repTarget: 8, note: 'Deload: -40% Weight Reduction' }
+        ];
+    }
 
     let fullHtml = '';
 
@@ -273,7 +287,9 @@ function generateRoutineHTML(clientName, mode, workoutData) {
             }
             groupedDays[key].push(ex);
         });
-
+        // Baki code...
+    });
+}
         let daysHtml = '';
         for (const [dayTitle, items] of Object.entries(groupedDays)) {
             let exerciseRowsHtml = '';
