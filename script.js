@@ -11,7 +11,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
-// Firebase Initialization (Compat Version - No Import Error)
 const firebaseConfig = {
   apiKey: "AIzaSyAh71e8jXZymGo3T-C2KegF9jfKHISe44s",
   authDomain: "workout-maker-c3953.firebaseapp.com",
@@ -252,11 +251,10 @@ clearAllBtn.addEventListener('click', () => {
     }
 });
 
-// Build 5-Week Routine HTML
+// Build 5-Week Routine HTML (Strength: Main Lifts 5 Reps, Accessories Progressive)
 function generateRoutineHTML(clientName, mode, workoutData) {
     let weeksConfig = [];
 
-    // Strength-eo accessories er jonno 8, 9, 10, 12 rep target rakha hocche
     if (mode === 'strength') {
         weeksConfig = [
             { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Main Lifts: 5 Reps | Accessories: 8 Reps' },
@@ -303,7 +301,7 @@ function generateRoutineHTML(clientName, mode, workoutData) {
                     currentWeight = (ex.weight + (w.week - 1) * increment).toFixed(1);
                 }
 
-                // Ekhane check kora hocche: Strength mode-e Squat, Bench ba Deadlift hole reps 5 hobe
+                // Strength mode-e Squat, Bench ba Deadlift hole fixed 5 reps hobe, baki gulo w.repTarget
                 let displayReps = w.repTarget;
                 const isMainLift = exNameLower.includes('squat') || exNameLower.includes('bench') || exNameLower.includes('deadlift');
                 if (mode === 'strength' && isMainLift) {
@@ -336,7 +334,7 @@ function generateRoutineHTML(clientName, mode, workoutData) {
             <div class="border rounded-xl p-3 ${w.week === 5 ? 'bg-amber-500/5 border-amber-500/30' : 'bg-slate-900/90 border-slate-800'}">
                 <div class="flex justify-between items-center mb-1">
                     <span class="font-bold text-xs ${w.week === 5 ? 'text-amber-400' : 'text-emerald-400'}">${w.title}</span>
-                    <span class="text-[9px] font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">Target Config</span>
+                    <span class="text-[9px] font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">${w.note.includes('Main Lifts') ? 'Strength Config' : `${w.repTarget} Reps Target`}</span>
                 </div>
                 <p class="text-[9px] text-slate-400 italic mb-1">${w.note}</p>
                 ${daysHtml}
@@ -346,6 +344,30 @@ function generateRoutineHTML(clientName, mode, workoutData) {
 
     return fullHtml;
 }
+
+// Load Routine for Editing in Builder
+function loadRoutineForEditing(client) {
+    customWorkouts = JSON.parse(JSON.stringify(client.workouts));
+    currentMode = client.mode || 'hypertrophy';
+    
+    if (currentMode === 'strength') {
+        btnStrength.click();
+    } else {
+        btnHypertrophy.click();
+    }
+    
+    const clientNameInput = document.getElementById('clientName');
+    const coachNameInput = document.getElementById('coachName');
+    if (clientNameInput) clientNameInput.value = client.name || '';
+    if (coachNameInput && client.coach) coachNameInput.value = client.coach;
+
+    localStorage.setItem('day_split_workouts_v7', JSON.stringify(customWorkouts));
+    renderWorkouts();
+    programModal.classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    alert(`Loaded ${client.name}'s routine into builder for editing!`);
+}
+
 // FIREBASE CLOUD SAVE: Generate & Save to Firestore
 generateProgramBtn.addEventListener('click', async () => {
     if(customWorkouts.length === 0) {
@@ -416,20 +438,29 @@ function renderAnalyticsList() {
                 </h4>
                 <p class="text-[9px] text-slate-500">${client.date} | Coach: ${client.coach || 'MD. Nadim Khan'}</p>
             </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">View Routine</span>
+            <div class="flex items-center space-x-1.5">
+                <button type="button" class="edit-routine-btn text-[10px] text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-md hover:bg-amber-500/20 transition">Edit</button>
+                <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-md">View</span>
                 <button type="button" class="delete-analytics-btn text-slate-600 hover:text-rose-400 p-1" data-id="${client.id}">
                     <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
             </div>
         `;
 
+        // View Routine on Click
         item.addEventListener('click', () => {
             pdfClientDisplay.textContent = `${client.name.toUpperCase()} - 5 WEEK PLAN`;
             pdfModeDisplay.textContent = `Mode: ${client.mode.toUpperCase()} | Coach: ${client.coach || 'MD. Nadim Khan'}`;
             pdfDate.textContent = client.date;
             modalProgramContent.innerHTML = generateRoutineHTML(client.name, client.mode, client.workouts);
             programModal.classList.remove('hidden');
+        });
+
+        // Edit Routine Button Action
+        const editBtn = item.querySelector('.edit-routine-btn');
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            loadRoutineForEditing(client);
         });
 
         analyticsClientList.appendChild(item);
