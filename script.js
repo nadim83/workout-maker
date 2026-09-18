@@ -256,17 +256,16 @@ clearAllBtn.addEventListener('click', () => {
 function generateRoutineHTML(clientName, mode, workoutData) {
     let weeksConfig = [];
 
-    // Mode check kore dynamic config set kora hocche
+    // Strength-eo accessories er jonno 8, 9, 10, 12 rep target rakha hocche
     if (mode === 'strength') {
         weeksConfig = [
-            { week: 1, title: 'Week 1: Base Line', repTarget: 5, note: 'Heavy Single/Low Reps' },
-            { week: 2, title: 'Week 2: Progression 1', repTarget: 5, note: 'Strength Focus' },
-            { week: 3, title: 'Week 3: Progression 2', repTarget: 5, note: 'Intensity Block' },
-            { week: 4, title: 'Week 4: Peak Overload', repTarget: 5, note: 'Max Effort' },
-            { week: 5, title: 'Week 5: Deload Recovery', repTarget: 5, note: 'Deload: -40% Weight' }
+            { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Main Lifts: 5 Reps | Accessories: 8 Reps' },
+            { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: 'Main Lifts: 5 Reps | Accessories: 9 Reps' },
+            { week: 3, title: 'Week 3: Progression 2', repTarget: 10, note: 'Main Lifts: 5 Reps | Accessories: 10 Reps' },
+            { week: 4, title: 'Week 4: Peak Overload', repTarget: 12, note: 'Main Lifts: 5 Reps | Accessories: 12 Reps' },
+            { week: 5, title: 'Week 5: Deload Recovery', repTarget: 8, note: 'Deload: -40% Weight Reduction' }
         ];
     } else {
-        // Default ba Hypertrophy-er jonno ager config
         weeksConfig = [
             { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Technique & Baseline Load' },
             { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: '+5kg Squat/DL, +2.5kg Others | 9 Reps' },
@@ -304,11 +303,18 @@ function generateRoutineHTML(clientName, mode, workoutData) {
                     currentWeight = (ex.weight + (w.week - 1) * increment).toFixed(1);
                 }
 
+                // Ekhane check kora hocche: Strength mode-e Squat, Bench ba Deadlift hole reps 5 hobe
+                let displayReps = w.repTarget;
+                const isMainLift = exNameLower.includes('squat') || exNameLower.includes('bench') || exNameLower.includes('deadlift');
+                if (mode === 'strength' && isMainLift) {
+                    displayReps = 5;
+                }
+
                 exerciseRowsHtml += `
                     <div class="flex justify-between items-center text-[10px] py-0.5">
                         <span class="text-slate-300 font-medium">• ${ex.name}</span>
                         <span class="text-right font-mono text-slate-400">
-                            ${ex.sets} Sets × ${w.repTarget} @ <strong class="text-emerald-400">${currentWeight}kg</strong>
+                            ${ex.sets} Sets × ${displayReps} @ <strong class="text-emerald-400">${currentWeight}kg</strong>
                         </span>
                     </div>
                 `;
@@ -330,7 +336,7 @@ function generateRoutineHTML(clientName, mode, workoutData) {
             <div class="border rounded-xl p-3 ${w.week === 5 ? 'bg-amber-500/5 border-amber-500/30' : 'bg-slate-900/90 border-slate-800'}">
                 <div class="flex justify-between items-center mb-1">
                     <span class="font-bold text-xs ${w.week === 5 ? 'text-amber-400' : 'text-emerald-400'}">${w.title}</span>
-                    <span class="text-[9px] font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">${w.repTarget} Reps Target</span>
+                    <span class="text-[9px] font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">Target Config</span>
                 </div>
                 <p class="text-[9px] text-slate-400 italic mb-1">${w.note}</p>
                 ${daysHtml}
@@ -340,7 +346,6 @@ function generateRoutineHTML(clientName, mode, workoutData) {
 
     return fullHtml;
 }
-
 // FIREBASE CLOUD SAVE: Generate & Save to Firestore
 generateProgramBtn.addEventListener('click', async () => {
     if(customWorkouts.length === 0) {
