@@ -260,9 +260,9 @@ function generateRoutineHTML(clientName, mode, workoutData) {
     if (mode === 'strength') {
         weeksConfig = [
             { week: 1, title: 'Week 1: Base Line', repTarget: 5, note: 'Heavy Single/Low Reps' },
-            { week: 2, title: 'Week 2: Progression 1', repTarget: 3, note: 'Strength Focus' },
-            { week: 3, title: 'Week 3: Progression 2', repTarget: 2, note: 'Intensity Block' },
-            { week: 4, title: 'Week 4: Peak Overload', repTarget: 1, note: 'Max Effort' },
+            { week: 2, title: 'Week 2: Progression 1', repTarget: 5, note: 'Strength Focus' },
+            { week: 3, title: 'Week 3: Progression 2', repTarget: 5, note: 'Intensity Block' },
+            { week: 4, title: 'Week 4: Peak Overload', repTarget: 5, note: 'Max Effort' },
             { week: 5, title: 'Week 5: Deload Recovery', repTarget: 5, note: 'Deload: -40% Weight' }
         ];
     } else {
