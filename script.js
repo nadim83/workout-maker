@@ -64,7 +64,8 @@ const splitOptions = {
     strength: [
         "Squat Day + Accessories",
         "Bench Press Day + Accessories",
-        "Deadlift Day + Accessories"
+        "Deadlift Day + Accessories",
+        "Squats Day + Bench press + Accessories"
     ]
 };
 
