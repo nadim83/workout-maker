@@ -257,7 +257,7 @@ function generateRoutineHTML(clientName, mode, workoutData) {
     let weeksConfig = [];
 
     // Mode check kore dynamic config set kora hocche
-    if (mode === 'Strength Training') {
+    if (mode === 'strength') {
         weeksConfig = [
             { week: 1, title: 'Week 1: Base Line', repTarget: 5, note: 'Heavy Single/Low Reps' },
             { week: 2, title: 'Week 2: Progression 1', repTarget: 3, note: 'Strength Focus' },
@@ -287,9 +287,7 @@ function generateRoutineHTML(clientName, mode, workoutData) {
             }
             groupedDays[key].push(ex);
         });
-        // Baki code...
-    });
-}
+
         let daysHtml = '';
         for (const [dayTitle, items] of Object.entries(groupedDays)) {
             let exerciseRowsHtml = '';
