@@ -58,7 +58,9 @@ const splitOptions = {
     hypertrophy: [
         "Push: Chest, Shoulder & Triceps",
         "Pull: Back, Rear Delt & Biceps",
-        "Legs & Abs"
+        "Legs & Abs",
+        "Full Body Compound Exercise",
+        "OFF Day"
     ],
     strength: [
         "Squat Day + Accessories",
