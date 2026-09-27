@@ -115,8 +115,8 @@ function populateSplitOptions() {
 
 btnHypertrophy.addEventListener('click', () => {
     currentMode = 'hypertrophy';
-    btnHypertrophy.className = "mode-tab active-tab text-xs py-2.5 rounded-xl font-bold border transition flex items-center justify-center space-x-2";
-    btnStrength.className = "mode-tab inactive-tab text-xs py-2.5 rounded-xl font-bold border transition flex items-center justify-center space-x-2";
+    btnHypertrophy.className = "mode-tab active-tab text-xs font-bold border transition flex items-center justify-center space-x-2";
+    btnStrength.className = "mode-tab inactive-tab text-xs  font-bold border transition flex items-center justify-center space-x-2";
     presetBtnText.textContent = "Load 1-Click PPL Preset Template";
     populateSplitOptions();
 });
