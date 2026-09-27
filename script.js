@@ -307,7 +307,7 @@ function generateRoutineHTML(clientName, mode, workoutData) {
                 let displayReps = w.repTarget;
                 const isMainLift = exNameLower.includes('squat') || exNameLower.includes('bench') || exNameLower.includes('deadlift');
                 if (mode === 'strength' && isMainLift) {
-                    displayReps = 5;
+                    displayReps = 5: 2.5;
                 }
 
                 exerciseRowsHtml += `
