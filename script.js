@@ -294,7 +294,7 @@ function generateRoutineHTML(clientName, mode, workoutData) {
             items.forEach(ex => {
                 const exNameLower = ex.name.toLowerCase();
                 const isHeavyLift = exNameLower.includes('squat') || exNameLower.includes('deadlift');
-                const increment = isHeavyLift ? 5.0 : 2.5;
+                const increment = isHeavyLift ? 5.0;
 
                 let currentWeight = 0;
                 if (w.week === 5) {
