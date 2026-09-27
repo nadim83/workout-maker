@@ -253,7 +253,10 @@ clearAllBtn.addEventListener('click', () => {
     }
 });
 
-// Build 5-Week Routine HTML (Strength: Main Lifts 5 Reps, Accessories Progressive)
+// Build 5-Week Routine HTML
+// Hypertrophy mode: reps progress week to week, weight stays constant (base load), deload week only reduces weight.
+// Strength mode: ONLY Squat / Bench / Deadlift keep reps fixed at 5 and progress the WEIGHT week to week.
+//                Accessory lifts in strength mode keep the previous behaviour (both reps & weight progress).
 function generateRoutineHTML(clientName, mode, workoutData) {
     let weeksConfig = [];
 
@@ -268,9 +271,9 @@ function generateRoutineHTML(clientName, mode, workoutData) {
     } else {
         weeksConfig = [
             { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Technique & Baseline Load' },
-            { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: '+5kg Squat/DL | 9 Reps' },
-            { week: 3, title: 'Week 3: Progression 2', repTarget: 10, note: '+5kg Squat/DL  | 10 Reps' },
-            { week: 4, title: 'Week 4: Peak Overload', repTarget: 12, note: 'Max Intent Peak | 12 Reps' },
+            { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: 'Same Weight | 9 Reps' },
+            { week: 3, title: 'Week 3: Progression 2', repTarget: 10, note: 'Same Weight | 10 Reps' },
+            { week: 4, title: 'Week 4: Peak Overload', repTarget: 12, note: 'Same Weight | 12 Reps' },
             { week: 5, title: 'Week 5: Deload Recovery', repTarget: 8, note: 'Deload: -40% Weight Reduction' }
         ];
     }
@@ -294,21 +297,30 @@ function generateRoutineHTML(clientName, mode, workoutData) {
             items.forEach(ex => {
                 const exNameLower = ex.name.toLowerCase();
                 const isHeavyLift = exNameLower.includes('squat') || exNameLower.includes('deadlift');
-                const increment = isHeavyLift ? 5.0;
-
-                let currentWeight = 0;
-                if (w.week === 5) {
-                    currentWeight = (ex.weight * 0.6).toFixed(1);
-                } else {
-                    currentWeight = (ex.weight + (w.week - 1) * increment).toFixed(1);
-                }
-
-                // Strength mode-e Squat, Bench ba Deadlift hole fixed 5 reps hobe, baki gulo w.repTarget
-                let displayReps = w.repTarget;
+                const increment = isHeavyLift ? 5.0 : 2.5;
                 const isMainLift = exNameLower.includes('squat') || exNameLower.includes('bench') || exNameLower.includes('deadlift');
-                if (mode === 'strength' && isMainLift) {
-                    displayReps = 5: 2.5;
+
+                let currentWeight;
+                let displayReps;
+
+                if (mode === 'hypertrophy') {
+                    // Hypertrophy: only reps change week to week, weight stays the same base load
+                    displayReps = w.repTarget;
+                    currentWeight = (w.week === 5) ? (ex.weight * 0.6) : ex.weight;
+                } else {
+                    // Strength mode
+                    if (isMainLift) {
+                        // Squat / Bench / Deadlift: reps fixed at 5, weight progresses week to week
+                        displayReps = 5;
+                        currentWeight = (w.week === 5) ? (ex.weight * 0.6) : (ex.weight + (w.week - 1) * increment);
+                    } else {
+                        // Accessories: reps progress like before, weight also progresses
+                        displayReps = w.repTarget;
+                        currentWeight = (w.week === 5) ? (ex.weight * 0.6) : (ex.weight + (w.week - 1) * increment);
+                    }
                 }
+
+                currentWeight = currentWeight.toFixed(1);
 
                 exerciseRowsHtml += `
                     <div class="flex justify-between items-center text-[10px] py-0.5">
