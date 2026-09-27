@@ -268,8 +268,8 @@ function generateRoutineHTML(clientName, mode, workoutData) {
     } else {
         weeksConfig = [
             { week: 1, title: 'Week 1: Base Line', repTarget: 8, note: 'Technique & Baseline Load' },
-            { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: '+5kg Squat/DL, +2.5kg Others | 9 Reps' },
-            { week: 3, title: 'Week 3: Progression 2', repTarget: 10, note: '+5kg Squat/DL, +2.5kg Others | 10 Reps' },
+            { week: 2, title: 'Week 2: Progression 1', repTarget: 9, note: '+5kg Squat/DL | 9 Reps' },
+            { week: 3, title: 'Week 3: Progression 2', repTarget: 10, note: '+5kg Squat/DL  | 10 Reps' },
             { week: 4, title: 'Week 4: Peak Overload', repTarget: 12, note: 'Max Intent Peak | 12 Reps' },
             { week: 5, title: 'Week 5: Deload Recovery', repTarget: 8, note: 'Deload: -40% Weight Reduction' }
         ];
